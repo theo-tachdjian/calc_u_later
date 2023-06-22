@@ -111,16 +111,12 @@ public class Calc_U_Later extends Application {
             if (!inputField.getText().isEmpty()) {
                 if (!isResult) {
                     if (this.operator != null && !this.operator.isEmpty()) {
-                        if (this.operator.equals("+")) {
-                            num1 = num1 + Double.parseDouble(inputField.getText());
-                        } else if (this.operator.equals("-")) {
-                            num1 = num1 - Double.parseDouble(inputField.getText());
-                        } else if (this.operator.equals("*")) {
-                            num1 = num1 * Double.parseDouble(inputField.getText());
-                        } else if (this.operator.equals("/")) {
-                            num1 = num1 / Double.parseDouble(inputField.getText());
-                        } else {
-                            num1 = Double.parseDouble(inputField.getText());
+                        switch (this.operator) {
+                            case "+" -> num1 = num1 + Double.parseDouble(inputField.getText());
+                            case "-" -> num1 = num1 - Double.parseDouble(inputField.getText());
+                            case "*" -> num1 = num1 * Double.parseDouble(inputField.getText());
+                            case "/" -> num1 = num1 / Double.parseDouble(inputField.getText());
+                            default -> num1 = Double.parseDouble(inputField.getText());
                         }
                     } else {
                         num1 = Double.parseDouble(inputField.getText());
