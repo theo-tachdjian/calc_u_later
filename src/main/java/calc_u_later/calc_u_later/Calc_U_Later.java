@@ -16,6 +16,7 @@ public class Calc_U_Later extends Application {
     private TextField inputField;
     private double num1, num2;
     private String operator;
+    private boolean isResult = false;
 
     @Override
     public void start(Stage primaryStage) {
@@ -25,6 +26,8 @@ public class Calc_U_Later extends Application {
         inputField = new TextField();
         inputField.setFont(globalFont);
         inputField.setEditable(false);
+        inputField.setDisable(true);
+        inputField.setOpacity(1);
 
         Button button0 = createNumberButton("0");
         Button button1 = createNumberButton("1");
@@ -37,8 +40,10 @@ public class Calc_U_Later extends Application {
         Button button8 = createNumberButton("8");
         Button button9 = createNumberButton("9");
 
+        Button buttonComma = createCommaButton();
+
         Button buttonAdd = createOperatorButton("+", 64, 128);
-        Button buttonSubtract = createOperatorButton("-", 64, 128);
+        Button buttonSubtract = createOperatorButton("-");
         Button buttonMultiply = createOperatorButton("*");
         Button buttonDivide = createOperatorButton("/");
         Button buttonPercentage = createPercentageButton();
@@ -71,13 +76,14 @@ public class Calc_U_Later extends Application {
 
         buttonsPane.add(button0, 0, 4);
         buttonsPane.add(buttonClear, 1, 4);
-        buttonsPane.add(buttonEquals, 2, 4, 2, 1);
+        buttonsPane.add(buttonComma, 2, 4);
+        buttonsPane.add(buttonEquals, 3, 4, 2, 1);
 
         buttonsPane.add(buttonDivide, 4, 0);
         buttonsPane.add(buttonMultiply, 3, 0);
-        buttonsPane.add(buttonSubtract, 4, 1, 1, 2);
-        buttonsPane.add(buttonAdd, 3, 1, 1, 2);
-        buttonsPane.add(buttonPercentage, 4, 4);
+        buttonsPane.add(buttonSubtract, 3, 1);
+        buttonsPane.add(buttonAdd, 4, 1, 1, 2);
+        buttonsPane.add(buttonPercentage, 3, 2);
 
         // Création de la scène principale
         Scene scene = new Scene(mainPane);
@@ -102,9 +108,32 @@ public class Calc_U_Later extends Application {
         Button button = createGenericButton(operator, width, height);
         button.setFont(globalFont);
         button.setOnAction(e -> {
-            num1 = Double.parseDouble(inputField.getText());
-            this.operator = operator;
-            inputField.clear();
+            if (!inputField.getText().isEmpty()) {
+                if (!isResult) {
+                    if (this.operator != null && !this.operator.isEmpty()) {
+                        if (this.operator.equals("+")) {
+                            num1 = num1 + Double.parseDouble(inputField.getText());
+                        } else if (this.operator.equals("-")) {
+                            num1 = num1 - Double.parseDouble(inputField.getText());
+                        } else if (this.operator.equals("*")) {
+                            num1 = num1 * Double.parseDouble(inputField.getText());
+                        } else if (this.operator.equals("/")) {
+                            num1 = num1 / Double.parseDouble(inputField.getText());
+                        } else {
+                            num1 = Double.parseDouble(inputField.getText());
+                        }
+                    } else {
+                        num1 = Double.parseDouble(inputField.getText());
+                    }
+                } else {
+                    num1 = Double.parseDouble(inputField.getText());
+                }
+
+                isResult = false;
+                this.operator = operator;
+                inputField.clear();
+                inputField.setPromptText(num1+this.operator);
+            }
         });
         return button;
     }
@@ -112,10 +141,27 @@ public class Calc_U_Later extends Application {
     private Button createPercentageButton() {
         Button button = createGenericButton("%");
         button.setOnAction(e -> {
-            num1 = Double.parseDouble(inputField.getText());
-            num1 /= 100.0;
-            this.operator = "*";
-            inputField.clear();
+            if (!inputField.getText().isEmpty()) {
+                num1 = Double.parseDouble(inputField.getText()) + num1;
+                num1 /= 100.0;
+
+                isResult = false;
+                this.operator = "*";
+                inputField.clear();
+                inputField.setPromptText(num1+this.operator);
+            }
+        });
+        return button;
+    }
+
+    private Button createCommaButton() {
+        Button button = createGenericButton(".");
+        button.setOnAction(e -> {
+            if (!inputField.getText().isEmpty() && !inputField.getText().contains(".")) {
+                inputField.setText(inputField.getText()+".");
+            } else if (inputField.getText().isEmpty()) {
+                inputField.setText("0.");
+            }
         });
         return button;
     }
@@ -123,9 +169,13 @@ public class Calc_U_Later extends Application {
     private Button createEqualsButton() {
         Button button = createGenericButton("=", 128, 64);
         button.setOnAction(e -> {
-            num2 = Double.parseDouble(inputField.getText());
-            double result = calculateResult();
-            inputField.setText(String.valueOf(result));
+            if (!inputField.getText().isEmpty()) {
+                num2 = Double.parseDouble(inputField.getText());
+                double result = calculateResult();
+                inputField.setText(String.valueOf(result));
+                isResult = true;
+                inputField.setPromptText("");
+            }
         });
         return button;
     }
@@ -133,10 +183,12 @@ public class Calc_U_Later extends Application {
     private Button createClearButton() {
         Button button = createGenericButton("C");
         button.setOnAction(e -> {
+            inputField.setPromptText("");
             inputField.clear();
             num1 = 0;
             num2 = 0;
             operator = "";
+            isResult = false;
         });
         return button;
     }
@@ -154,7 +206,7 @@ public class Calc_U_Later extends Application {
     }
 
     private double calculateResult() {
-        if (!operator.isEmpty()) {
+        if (operator != null && !operator.isEmpty()) {
             switch (operator) {
                 case "+":
                     return num1 + num2;
