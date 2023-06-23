@@ -13,6 +13,7 @@ public class Calc_U_Later extends Application {
 
     private final Font globalFont = new Font("Arial", 24);
     private final Font memoryFont = new Font("Arial", 20);
+    private final Font scientificFont = memoryFont;
 
     private TextField inputField;
     private double num1, num2;
@@ -78,19 +79,114 @@ public class Calc_U_Later extends Application {
             }
         });
 
+        // boutons scientifiques
+        Button buttonFactorial = createScientificRelatedButton("n!", 64, 48, e -> {
+            if (!inputField.getText().isEmpty()) {
+                double expression = Double.parseDouble(inputField.getText());
+                if (expression == (long) expression) {
+                    long num = fact((long) expression);
+                    if (num > 0) {
+                        inputField.setText(""+num);
+                    } else {
+                        inputField.clear();
+                        String message = (num == -1) ? "Entrée non valide" : "Dépassement de capacité";
+                        inputField.setPromptText(message);
+                    }
+                }
+            }
+        });
+        Button buttonInverse = createScientificRelatedButton("¹/ₓ", 64, 48, e -> {
+            if (!inputField.getText().isEmpty()) {
+                double expression = Double.parseDouble(inputField.getText());
+                if (expression == 0) {
+                    inputField.clear();
+                    inputField.setPromptText("Entrée non valide");
+                } else {
+                    inputField.setText(""+(1/expression));
+                }
+            }
+        });
+        Button buttonAbs = createScientificRelatedButton("|x|", e -> {
+            if (!inputField.getText().isEmpty()) {
+                double expression = Double.parseDouble(inputField.getText());
+                inputField.setText(""+Math.abs(expression));
+            }
+        });
+        Button buttonSqrt = createScientificRelatedButton("√", e -> {
+            if (!inputField.getText().isEmpty()) {
+                double expression = Double.parseDouble(inputField.getText());
+                if (expression < 0) {
+                    inputField.clear();
+                    inputField.setPromptText("Entrée non valide");
+                } else {
+                    inputField.setText(""+Math.sqrt(expression));
+                }
+            }
+        });
+        Button buttonPow = createOperatorButton("^");
+        Button buttonLog = createScientificRelatedButton("Log", e -> {
+            if (!inputField.getText().isEmpty()) {
+                double expression = Double.parseDouble(inputField.getText());
+                if (expression < 0) {
+                    inputField.clear();
+                    inputField.setPromptText("Entrée non valide");
+                } else {
+                    inputField.setText(""+Math.log10(expression));
+                }
+            }
+        });
+        Button buttonLn = createScientificRelatedButton("Ln", e -> {
+            if (!inputField.getText().isEmpty()) {
+                double expression = Double.parseDouble(inputField.getText());
+                if (expression < 0) {
+                    inputField.clear();
+                    inputField.setPromptText("Entrée non valide");
+                } else {
+                    inputField.setText(""+Math.log(expression));
+                }
+            }
+        });
+        Button buttonSin = createScientificRelatedButton("sin", e -> {
+            if (!inputField.getText().isEmpty()) {
+                double expression = Double.parseDouble(inputField.getText());
+                inputField.setText(""+Math.sin(expression));
+            }
+        });
+        Button buttonCos = createScientificRelatedButton("cos", e -> {
+            if (!inputField.getText().isEmpty()) {
+                double expression = Double.parseDouble(inputField.getText());
+                inputField.setText(""+Math.cos(expression));
+            }
+        });
+        Button buttonTan = createScientificRelatedButton("tan", e -> {
+            if (!inputField.getText().isEmpty()) {
+                double expression = Math.tan(Double.parseDouble(inputField.getText()));
+                if (Double.isNaN(expression)) {     // if cos(expression) == 0 (invalid: sin/0)
+                    inputField.clear();
+                    inputField.setPromptText("Entrée non valide");
+                } else {
+                    inputField.setText(""+expression);
+                }
+            }
+        });
+
         // Création de la disposition de la calculatrice
-        GridPane mainPane = new GridPane();     // panel principal
+        GridPane rootPane = new GridPane();     // panel principal
+        GridPane layoutPane = new GridPane();   // panel pour le layout des autres panels
 
         GridPane buttonsPane = new GridPane();      // panel des boutons
         GridPane memoryPane = new GridPane();       // panel des boutons de gestion de mémoire
+        GridPane scientificPane = new GridPane();    // panel des boutons scientifiques
 
-        mainPane.setPadding(new Insets(10));
-        mainPane.setHgap(5);
-        mainPane.setVgap(5);
+        rootPane.setPadding(new Insets(10));
+        rootPane.setHgap(5);
+        rootPane.setVgap(5);
 
-        mainPane.add(inputField, 0, 0);
-        mainPane.add(memoryPane, 0, 1);
-        mainPane.add(buttonsPane, 0, 2);
+        rootPane.add(inputField, 0, 0, 2, 1);
+        layoutPane.add(memoryPane, 0, 1);
+        layoutPane.add(buttonsPane, 0, 2);
+        rootPane.add(layoutPane, 0, 1);
+        rootPane.add(scientificPane, 1, 1);
 
         buttonsPane.add(button7, 0, 0);
         buttonsPane.add(button8, 1, 0);
@@ -109,8 +205,8 @@ public class Calc_U_Later extends Application {
         buttonsPane.add(buttonComma, 2, 4);
         buttonsPane.add(buttonEquals, 3, 4, 2, 1);
 
-        buttonsPane.add(buttonDivide, 4, 0);
-        buttonsPane.add(buttonMultiply, 3, 0);
+        buttonsPane.add(buttonDivide, 3, 0);
+        buttonsPane.add(buttonMultiply, 4, 0);
         buttonsPane.add(buttonSubtract, 3, 1);
         buttonsPane.add(buttonAdd, 4, 1, 1, 2);
         buttonsPane.add(buttonPercentage, 3, 2);
@@ -121,10 +217,33 @@ public class Calc_U_Later extends Application {
         memoryPane.add(buttonMemSub, 3, 0);
         memoryPane.add(buttonMemSave, 4, 0);
 
+        scientificPane.add(buttonFactorial, 0, 0);
+        scientificPane.add(buttonInverse, 1, 0);
+        scientificPane.add(buttonAbs, 0, 1);
+        scientificPane.add(buttonPow, 1, 1);
+        scientificPane.add(buttonLn, 0, 2);
+        scientificPane.add(buttonLog, 1, 2);
+        scientificPane.add(buttonSqrt, 0, 3);
+        scientificPane.add(buttonSin, 1, 3);
+        scientificPane.add(buttonCos, 0, 4);
+        scientificPane.add(buttonTan, 1, 4);
+
         // Création de la scène principale
-        Scene scene = new Scene(mainPane);
+        Scene scene = new Scene(rootPane);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private long fact(long n) {
+        long result = 1;
+        if (n < 0) return -1;
+        long i = 0;
+        while (n-i > 0) {
+            if (result < 0) return 0;
+            result *= n-i;
+            i++;
+        }
+        return result;
     }
 
     private Button createNumberButton(String number) {
@@ -157,6 +276,7 @@ public class Calc_U_Later extends Application {
                             case "-" -> num1 = num1 - Double.parseDouble(inputField.getText());
                             case "*" -> num1 = num1 * Double.parseDouble(inputField.getText());
                             case "/" -> num1 = num1 / Double.parseDouble(inputField.getText());
+                            case "^" -> num1 = Math.pow(num1, Double.parseDouble(inputField.getText()));
                             default -> num1 = Double.parseDouble(inputField.getText());
                         }
                     } else {
@@ -166,7 +286,13 @@ public class Calc_U_Later extends Application {
                     num1 = Double.parseDouble(inputField.getText());
                 }
 
-                isResult = false;
+                this.isResult = false;
+                this.operator = operator;
+                inputField.clear();
+                inputField.setPromptText(num1+this.operator);
+            } else {
+                num1 = 0;
+                this.isResult = false;
                 this.operator = operator;
                 inputField.clear();
                 inputField.setPromptText(num1+this.operator);
@@ -211,7 +337,7 @@ public class Calc_U_Later extends Application {
                 num2 = Double.parseDouble(inputField.getText());
                 double result = calculateResult();
                 inputField.setText(String.valueOf(result));
-                isResult = true;
+                this.isResult = true;
                 inputField.setPromptText("");
             }
         });
@@ -225,8 +351,8 @@ public class Calc_U_Later extends Application {
             inputField.clear();
             num1 = 0;
             num2 = 0;
-            operator = "";
-            isResult = false;
+            this.operator = "";
+            this.isResult = false;
         });
         return button;
     }
@@ -234,6 +360,17 @@ public class Calc_U_Later extends Application {
     private Button createMemoryRelatedButton(String text, javafx.event.EventHandler<javafx.event.ActionEvent> e) {
         Button button = createGenericButton(text, 64,48);
         button.setFont(memoryFont);
+        button.setOnAction(e);
+        return button;
+    }
+
+    private Button createScientificRelatedButton(String text, javafx.event.EventHandler<javafx.event.ActionEvent> e) {
+        return createScientificRelatedButton(text, 64, 64, e);
+    }
+
+    private Button createScientificRelatedButton(String text, int width, int height, javafx.event.EventHandler<javafx.event.ActionEvent> e) {
+        Button button = createGenericButton(text, width,height);
+        button.setFont(scientificFont);
         button.setOnAction(e);
         return button;
     }
@@ -259,8 +396,10 @@ public class Calc_U_Later extends Application {
                     return num1 * num2;
                 case "/":
                     return num1 / num2;
+                case "^":
+                    return Math.pow(num1, num2);
                 default:
-                    return 0;
+                    return Double.NaN;
             }
         } else if (num2 != 0) {
             return num2;
