@@ -12,21 +12,27 @@ import javafx.stage.Stage;
 public class Calc_U_Later extends Application {
 
     private final Font globalFont = new Font("Arial", 24);
+    private final Font memoryFont = new Font("Arial", 20);
 
     private TextField inputField;
     private double num1, num2;
     private String operator;
     private boolean isResult = false;
+    private double memoryValue;
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Calc_U_Later");
+        primaryStage.setResizable(false);
 
         // Création des éléments de l'interface utilisateur
+
+        // champs pour afficher le calcul
         inputField = new TextField();
         inputField.setFont(globalFont);
         inputField.setEditable(false);
         inputField.setDisable(true);
+        // met l'opacité au maximum car la fonction setDisable() réduit par défaut l'opacité
         inputField.setOpacity(1);
 
         Button button0 = createNumberButton("0");
@@ -50,17 +56,41 @@ public class Calc_U_Later extends Application {
         Button buttonEquals = createEqualsButton();
         Button buttonClear = createClearButton();
 
+        // boutons pour la gestion de la mémoire
+        Button buttonMemClear = createMemoryRelatedButton("MC", e -> this.memoryValue = 0.0);
+        Button buttonMemRecall = createMemoryRelatedButton("MR", e -> {
+            this.inputField.setText(Double.toString(this.memoryValue));
+            this.isResult = true;
+        });
+        Button buttonMemAdd = createMemoryRelatedButton("M+", e -> {
+            if (!inputField.getText().isEmpty()) {
+                this.memoryValue += Double.parseDouble(inputField.getText());
+            }
+        });
+        Button buttonMemSub = createMemoryRelatedButton("M-", e -> {
+            if (!inputField.getText().isEmpty()) {
+                this.memoryValue -= Double.parseDouble(inputField.getText());
+            }
+        });
+        Button buttonMemSave = createMemoryRelatedButton("MS", e -> {
+            if (!inputField.getText().isEmpty()) {
+                this.memoryValue = Double.parseDouble(inputField.getText());
+            }
+        });
+
         // Création de la disposition de la calculatrice
         GridPane mainPane = new GridPane();     // panel principal
 
-        GridPane buttonsPane = new GridPane();     // panel des boutons
+        GridPane buttonsPane = new GridPane();      // panel des boutons
+        GridPane memoryPane = new GridPane();       // panel des boutons de gestion de mémoire
 
         mainPane.setPadding(new Insets(10));
         mainPane.setHgap(5);
         mainPane.setVgap(5);
 
-        mainPane.add(inputField, 0, 0, 2, 1);
-        mainPane.add(buttonsPane, 0, 1);
+        mainPane.add(inputField, 0, 0);
+        mainPane.add(memoryPane, 0, 1);
+        mainPane.add(buttonsPane, 0, 2);
 
         buttonsPane.add(button7, 0, 0);
         buttonsPane.add(button8, 1, 0);
@@ -85,6 +115,12 @@ public class Calc_U_Later extends Application {
         buttonsPane.add(buttonAdd, 4, 1, 1, 2);
         buttonsPane.add(buttonPercentage, 3, 2);
 
+        memoryPane.add(buttonMemClear, 0, 0);
+        memoryPane.add(buttonMemRecall, 1, 0);
+        memoryPane.add(buttonMemAdd, 2, 0);
+        memoryPane.add(buttonMemSub, 3, 0);
+        memoryPane.add(buttonMemSave, 4, 0);
+
         // Création de la scène principale
         Scene scene = new Scene(mainPane);
         primaryStage.setScene(scene);
@@ -94,8 +130,13 @@ public class Calc_U_Later extends Application {
     private Button createNumberButton(String number) {
         Button button = createGenericButton(number);
         button.setOnAction(e -> {
-            String currentText = inputField.getText();
-            inputField.setText(currentText + number);
+            if (this.isResult) {
+                inputField.setText(number);
+                this.isResult = false;
+            } else {
+                String currentText = inputField.getText();
+                inputField.setText(currentText + number);
+            }
         });
         return button;
     }
@@ -153,10 +194,11 @@ public class Calc_U_Later extends Application {
     private Button createCommaButton() {
         Button button = createGenericButton(".");
         button.setOnAction(e -> {
-            if (!inputField.getText().isEmpty() && !inputField.getText().contains(".")) {
-                inputField.setText(inputField.getText()+".");
-            } else if (inputField.getText().isEmpty()) {
+            if (this.isResult || inputField.getText().isEmpty()) {
                 inputField.setText("0.");
+                this.isResult = false;
+            } else if (!inputField.getText().isEmpty() && !inputField.getText().contains(".")) {
+                inputField.setText(inputField.getText()+".");
             }
         });
         return button;
@@ -189,9 +231,14 @@ public class Calc_U_Later extends Application {
         return button;
     }
 
-    private Button createGenericButton(String text) {
-        return createGenericButton(text, 64, 64);
+    private Button createMemoryRelatedButton(String text, javafx.event.EventHandler<javafx.event.ActionEvent> e) {
+        Button button = createGenericButton(text, 64,48);
+        button.setFont(memoryFont);
+        button.setOnAction(e);
+        return button;
     }
+
+    private Button createGenericButton(String text) { return createGenericButton(text, 64, 64); }
 
     private Button createGenericButton(String text, int width, int height) {
         Button button = new Button(text);
