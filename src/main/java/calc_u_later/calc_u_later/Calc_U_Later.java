@@ -86,7 +86,7 @@ public class Calc_U_Later extends Application {
                 if (expression == (long) expression) {
                     long num = fact((long) expression);
                     if (num > 0) {
-                        inputField.setText(""+num);
+                        inputField.setText(String.valueOf(num));
                     } else {
                         inputField.clear();
                         String message = (num == -1) ? "Entrée non valide" : "Dépassement de capacité";
@@ -102,14 +102,14 @@ public class Calc_U_Later extends Application {
                     inputField.clear();
                     inputField.setPromptText("Entrée non valide");
                 } else {
-                    inputField.setText(""+(1/expression));
+                    inputField.setText(String.valueOf(1 / expression));
                 }
             }
         });
         Button buttonAbs = createScientificRelatedButton("|x|", e -> {
             if (!inputField.getText().isEmpty()) {
                 double expression = Double.parseDouble(inputField.getText());
-                inputField.setText(""+Math.abs(expression));
+                inputField.setText(String.valueOf(Math.abs(expression)));
             }
         });
         Button buttonSqrt = createScientificRelatedButton("√", e -> {
@@ -119,7 +119,7 @@ public class Calc_U_Later extends Application {
                     inputField.clear();
                     inputField.setPromptText("Entrée non valide");
                 } else {
-                    inputField.setText(""+Math.sqrt(expression));
+                    inputField.setText(String.valueOf(Math.sqrt(expression)));
                 }
             }
         });
@@ -131,7 +131,7 @@ public class Calc_U_Later extends Application {
                     inputField.clear();
                     inputField.setPromptText("Entrée non valide");
                 } else {
-                    inputField.setText(""+Math.log10(expression));
+                    inputField.setText(String.valueOf(Math.log10(expression)));
                 }
             }
         });
@@ -142,20 +142,20 @@ public class Calc_U_Later extends Application {
                     inputField.clear();
                     inputField.setPromptText("Entrée non valide");
                 } else {
-                    inputField.setText(""+Math.log(expression));
+                    inputField.setText(String.valueOf(Math.log(expression)));
                 }
             }
         });
         Button buttonSin = createScientificRelatedButton("sin", e -> {
             if (!inputField.getText().isEmpty()) {
                 double expression = Double.parseDouble(inputField.getText());
-                inputField.setText(""+Math.sin(expression));
+                inputField.setText(String.valueOf(Math.sin(expression)));
             }
         });
         Button buttonCos = createScientificRelatedButton("cos", e -> {
             if (!inputField.getText().isEmpty()) {
                 double expression = Double.parseDouble(inputField.getText());
-                inputField.setText(""+Math.cos(expression));
+                inputField.setText(String.valueOf(Math.cos(expression)));
             }
         });
         Button buttonTan = createScientificRelatedButton("tan", e -> {
@@ -165,7 +165,7 @@ public class Calc_U_Later extends Application {
                     inputField.clear();
                     inputField.setPromptText("Entrée non valide");
                 } else {
-                    inputField.setText(""+expression);
+                    inputField.setText(String.valueOf(expression));
                 }
             }
         });
